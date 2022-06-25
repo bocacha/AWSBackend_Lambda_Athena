@@ -1,0 +1,52 @@
+plugins {
+	id 'org.springframework.boot' version '2.7.1'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java'
+}
+
+group = 'org.bootcamp.latam'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+// https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-bom
+	implementation 'com.amazonaws:aws-java-sdk-bom:1.12.243'
+// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter
+	implementation 'org.springframework.boot:spring-boot-starter:2.7.0'
+// https://mvnrepository.com/artifact/software.amazon.awssdk/auth
+	implementation 'software.amazon.awssdk:auth:2.17.209'
+// https://mvnrepository.com/artifact/software.amazon.awssdk/athena
+	implementation 'software.amazon.awssdk:athena:2.17.209'
+// https://mvnrepository.com/artifact/com.amazonaws/aws-lambda-java-core
+	implementation 'com.amazonaws:aws-lambda-java-core:1.2.1'
+// https://mvnrepository.com/artifact/org.projectlombok/lombok
+	compileOnly 'org.projectlombok:lombok:1.18.24'
+// https://mvnrepository.com/artifact/software.amazon.awssdk/url-connection-client
+	implementation 'software.amazon.awssdk:url-connection-client:2.17.216'
+// https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-core
+	implementation group: 'com.amazonaws', name: 'aws-java-sdk-core', version: '1.11.94'
+// https://mvnrepository.com/artifact/commons-io/commons-io
+	implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
+
+}
+task buildZip(type: Zip) {
+	from compileJava
+	from processResources
+	into('lib') {
+		from(configurations.compileClasspath) {
+			exclude 'tomcat-embed-*'
+		}
+	}
+}
+
+//tasks.named('test') {
+//	useJUnitPlatform()
+//}
+
+build.dependsOn buildZip
