@@ -1,0 +1,56 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Using Spring Boot in Lambda example
+
+Parameters:
+  functionName:
+    Type: String
+  functionHandler:
+    Type: String
+  s3BucketKey:
+    Type: String
+
+Resources:
+  lambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket: aws-lambda-bootcamp-bucket
+        S3Key: !Ref s3BucketKey
+      Description: The Lambda function
+      FunctionName: !Ref functionName
+      Handler: !Ref functionHandler
+      MemorySize: 512
+      Role: !GetAtt lambdaIAMRole.Arn
+      Runtime: java11
+      Timeout: 200
+
+  lambdaIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+      Policies:
+        - PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Effect: Allow
+                Resource:
+                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${functionName}:*
+          PolicyName: lambda
+
+  lambdaLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${functionName}
+      RetentionInDays: 90
